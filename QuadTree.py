@@ -42,10 +42,10 @@ class QuadTree:
                        self.boundary.w / 2, self.boundary.h / 2)
         sW = Rectangle(self.boundary.x - (self.boundary.w / 2), self.boundary.y - (self.boundary.h / 2),
                        self.boundary.w / 2, self.boundary.h / 2)
-        NorthEast = QuadTree(nE, self.bucket)
-        NorthWest = QuadTree(nW, self.bucket)
-        SouthEast = QuadTree(sE, self.bucket)
-        SouthWest = QuadTree(sW, self.bucket)
+        self.NorthEast = QuadTree(nE, self.bucket)
+        self.NorthWest = QuadTree(nW, self.bucket)
+        self.SouthEast = QuadTree(sE, self.bucket)
+        self.SouthWest = QuadTree(sW, self.bucket)
 
     def insert(self, point):
         if not self.contains(point):
@@ -59,31 +59,32 @@ class QuadTree:
             self.subdivide()
             self.divided = True
 
-        if self.NorthEast.insert(point):
+        if self.NorthEast.insert(point) is not None:
             return True
-        if self.NorthWest.insert(point):
+        if self.NorthWest.insert(point) is not None:
             return True
-        if self.SouthEast.insert(point):
+        if self.SouthEast.insert(point) is not None:
             return True
-        if self.SouthWest.insert(point):
+        if self.SouthWest.insert(point) is not None:
             return True
 
         return False
 
     def visualize(self, pointsList):
         root = Tk()
-        canvas = tkinter.Canvas()
+        canvas = Canvas(root, height=700, width=700, bg='#fff')
+        canvas.pack()
+        for point in pointsList:
+            canvas.create_oval(point.x - 3, point.y - 3, point.x + 3, point.y + 3)
         self.paint(canvas)
         root.mainloop()
 
     def paint(self, canvas):
         canvas.create_rectangle(self.boundary.x - self.boundary.w, self.boundary.y + self.boundary.h,
-                                self.boundary.x + self.boundary.w, self.boundary.y - self.boundary.h)
+                                self.boundary.x + self.boundary.w, self.boundary.y - self.boundary.h, outline='#fb0')
 
         if self.divided:
-            self.paint(self.NorthEast)
-            self.paint(self.NorthWest)
-            self.paint(self.SouthEast)
-            self.paint(self.SouthWest)
-
-
+            self.NorthEast.paint(canvas)
+            self.NorthWest.paint(canvas)
+            self.SouthEast.paint(canvas)
+            self.SouthWest.paint(canvas)
